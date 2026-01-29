@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FHIR R4 Patient Data Converter - Healthcare Interoperability Tool">
+    <title>FHIR Patient Data Converter</title>
+    <link rel="stylesheet" href="fhir-converter.css">
+</head>
+<body>
+    <!-- Language Toggle -->
+    <nav class="language-nav" aria-label="Language Selection">
+        <button id="lang-en" class="lang-btn active" aria-pressed="true">English</button>
+        <button id="lang-es" class="lang-btn" aria-pressed="false">Español</button>
+    </nav>
+
+    <main class="container">
+        <header class="page-header">
+            <h1 id="main-title">FHIR R4 Patient Data Converter</h1>
+            <p id="main-subtitle">Healthcare Interoperability Standard Compliant</p>
+        </header>
+
+        <!-- Patient Intake Form -->
+        <section id="patient-form-section" class="card">
+            <h2 id="form-title">Patient Information</h2>
+            
+            <form id="patient-form" novalidate>
+                <!-- Demographics -->
+                <fieldset>
+                    <legend id="legend-demographics">Demographics</legend>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName" id="label-firstname">First Name</label>
+                            <input type="text" id="firstName" name="firstName" required 
+                                   aria-required="true" aria-describedby="firstName-error">
+                            <span class="error-message" id="firstName-error" role="alert"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="lastName" id="label-lastname">Last Name</label>
+                            <input type="text" id="lastName" name="lastName" required 
+                                   aria-required="true" aria-describedby="lastName-error">
+                            <span class="error-message" id="lastName-error" role="alert"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dob" id="label-dob">Date of Birth</label>
+                            <input type="date" id="dob" name="dob" required 
+                                   aria-required="true" aria-describedby="dob-error">
+                            <span class="error-message" id="dob-error" role="alert"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="gender" id="label-gender">Gender</label>
+                            <select id="gender" name="gender" required aria-required="true">
+                                <option value="" id="option-select">Select...</option>
+                                <option value="male" id="option-male">Male</option>
+                                <option value="female" id="option-female">Female</option>
+                                <option value="other" id="option-other">Other</option>
+                                <option value="unknown" id="option-unknown">Unknown</option>
+                            </select>
+                            <span class="error-message" id="gender-error" role="alert"></span>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Contact Information -->
+                <fieldset>
+                    <legend id="legend-contact">Contact Information</legend>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone" id="label-phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" 
+                                   placeholder="(555) 123-4567" aria-describedby="phone-error">
+                            <span class="error-message" id="phone-error" role="alert"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" id="label-email">Email Address</label>
+                            <input type="email" id="email" name="email" 
+                                   aria-describedby="email-error">
+                            <span class="error-message" id="email-error" role="alert"></span>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Address -->
+                <fieldset>
+                    <legend id="legend-address">Address</legend>
+                    
+                    <div class="form-group">
+                        <label for="addressLine" id="label-addressline">Street Address</label>
+                        <input type="text" id="addressLine" name="addressLine" 
+                               aria-describedby="addressLine-error">
+                        <span class="error-message" id="addressLine-error" role="alert"></span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city" id="label-city">City</label>
+                            <input type="text" id="city" name="city">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="state" id="label-state">State</label>
+                            <input type="text" id="state" name="state" 
+                                   placeholder="CA" maxlength="2">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="postalCode" id="label-postalcode">Postal Code</label>
+                            <input type="text" id="postalCode" name="postalCode" 
+                                   placeholder="12345">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Emergency Contact -->
+                <fieldset>
+                    <legend id="legend-emergency">Emergency Contact</legend>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="emergencyName" id="label-emergencyname">Contact Name</label>
+                            <input type="text" id="emergencyName" name="emergencyName">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="emergencyRelationship" id="label-relationship">Relationship</label>
+                            <input type="text" id="emergencyRelationship" name="emergencyRelationship" 
+                                   placeholder="Spouse, Parent, etc.">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="emergencyPhone" id="label-emergencyphone">Contact Phone</label>
+                        <input type="tel" id="emergencyPhone" name="emergencyPhone" 
+                               placeholder="(555) 987-6543">
+                        <span class="error-message" id="emergencyPhone-error" role="alert"></span>
+                    </div>
+                </fieldset>
+
+                <!-- Action Buttons -->
+                <div class="button-group">
+                    <button type="button" id="btn-demo" class="btn btn-secondary">
+                        <span id="btn-demo-text">Load Demo Data</span>
+                    </button>
+                    <button type="submit" id="btn-generate" class="btn btn-primary">
+                        <span id="btn-generate-text">Generate FHIR JSON</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- FHIR JSON Output -->
+        <section id="fhir-converter" class="card" aria-live="polite">
+            <h2 id="output-title">FHIR R4 JSON Output</h2>
+            
+            <div class="output-controls">
+                <button id="btn-download" class="btn btn-success" disabled>
+                    <span id="btn-download-text">Download JSON</span>
+                </button>
+                <button id="btn-copy" class="btn btn-secondary" disabled>
+                    <span id="btn-copy-text">Copy to Clipboard</span>
+                </button>
+            </div>
+
+            <pre id="fhir-output" class="json-output" role="region" aria-label="FHIR JSON Output">
+                <code id="fhir-code" class="language-json"></code>
+            </pre>
+
+            <!-- Metadata Display -->
+            <dl class="metadata" id="metadata-section" style="display: none;">
+                <dt id="meta-resource">Resource Type:</dt>
+                <dd id="meta-resource-value">Patient</dd>
+		<dt id="meta-standard">FHIR Standard:</dt>
+            <dd id="meta-standard-value">R4 (v4.0.1)</dd>
+            
+            <dt id="meta-timestamp">Generated:</dt>
+            <dd id="meta-timestamp-value"></dd>
+        </dl>
+    </section>
+</main>
+
+<footer class="page-footer">
+    <p id="footer-text">Built for Healthcare Interoperability | HL7 FHIR R4 Compliant</p>
+</footer>
+
+<script src="fhir-converter.js"></script>
+</body>
+</html>
