@@ -1,0 +1,6 @@
+[
+  {"firstName": "María", "lastName": "García", "dob": "1985-03-15", "gender": "female"},
+  {"firstName": "", "lastName": "Nguyen", "dob": "2999-01-01", "gender": "M", "email": "nope", "state": "ZZ"},
+  {"firstName": "Sam", "lastName": "Lee", "dob": "1990-07-04", "gender": "unknown",
+   "emergencyName": "Cher", "emergencyRelationship": "Madre"}
+]

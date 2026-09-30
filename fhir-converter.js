@@ -109,12 +109,41 @@ let currentFhirJson = null;
 // FHIR R4 Mapping Module
 // ===================================
 
+// Free-text relationship (EN/ES) -> v3-RoleCode. Mirrors fhir_converter/mapping.py.
+const RELATIONSHIPS = {
+    spouse: ["SPS", "spouse"], esposo: ["SPS", "spouse"], esposa: ["SPS", "spouse"],
+    husband: ["HUSB", "husband"], wife: ["WIFE", "wife"],
+    partner: ["DOMPART", "domestic partner"], pareja: ["DOMPART", "domestic partner"],
+    mother: ["MTH", "mother"], madre: ["MTH", "mother"],
+    father: ["FTH", "father"], padre: ["FTH", "father"], parent: ["PRN", "parent"],
+    son: ["SON", "natural son"], hijo: ["SON", "natural son"],
+    daughter: ["DAU", "natural daughter"], hija: ["DAU", "natural daughter"], child: ["CHILD", "child"],
+    brother: ["BRO", "brother"], hermano: ["BRO", "brother"],
+    sister: ["SIS", "sister"], hermana: ["SIS", "sister"], sibling: ["SIB", "sibling"],
+    friend: ["FRND", "unrelated friend"], amigo: ["FRND", "unrelated friend"], amiga: ["FRND", "unrelated friend"],
+    neighbor: ["NBOR", "neighbor"], vecino: ["NBOR", "neighbor"], vecina: ["NBOR", "neighbor"]
+};
+
+const escapeHtml = s => String(s).replace(/[&<>"']/g, c => (
+    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+));
+
+function splitName(full) {
+    const parts = full.split(/\s+/).filter(Boolean);
+    const name = { text: full };
+    if (parts.length) name.family = parts[parts.length - 1];
+    if (parts.length > 1) name.given = parts.slice(0, -1);   // never emit an empty array
+    return name;
+}
+
 /**
- * Maps form data to FHIR R4 Patient Resource
+ * Maps form data to FHIR R4 Patient Resource (US Core Patient profile).
+ * FHIR forbids empty arrays, so telecom/address/contact are only added when populated.
  * @param {Object} formData - Raw form data
  * @returns {Object} FHIR R4 compliant Patient resource
  */
 function mapToFhirPatient(formData) {
+    const displayName = `${formData.firstName} ${formData.lastName}`;
     const fhirPatient = {
         resourceType: "Patient",
         id: generatePatientId(),
@@ -125,12 +154,14 @@ function mapToFhirPatient(formData) {
         },
         text: {
             status: "generated",
-            div: `<div xmlns="http://www.w3.org/1999/xhtml">Patient: ${formData.firstName} ${formData.lastName}</div>`
+            div: `<div xmlns="http://www.w3.org/1999/xhtml">Patient: ${escapeHtml(displayName)}</div>`
         },
         identifier: [
             {
-                use: "official",
-                system: "urn:oid:2.16.840.1.113883.4.1",
+                use: "usual",
+                // Typed as a medical record number (the previous OID was the US SSN namespace).
+                type: { coding: [{ system: "http://terminology.hl7.org/CodeSystem/v2-0203", code: "MR", display: "Medical record number" }] },
+                system: "http://hospital.example.org/fhir/mrn",
                 value: generateMRN()
             }
         ],
@@ -142,82 +173,43 @@ function mapToFhirPatient(formData) {
                 given: [formData.firstName]
             }
         ],
-        telecom: [],
         gender: formData.gender,
-        birthDate: formData.dob,
-        address: [],
-        contact: []
+        birthDate: formData.dob
     };
 
-    // Add phone telecom if provided
-    if (formData.phone) {
-        fhirPatient.telecom.push({
-            system: "phone",
-            value: formData.phone,
-            use: "home"
-        });
-    }
+    const telecom = [];
+    if (formData.phone) telecom.push({ system: "phone", value: formData.phone, use: "home" });
+    if (formData.email) telecom.push({ system: "email", value: formData.email, use: "home" });
+    if (telecom.length) fhirPatient.telecom = telecom;
 
-    // Add email telecom if provided
-    if (formData.email) {
-        fhirPatient.telecom.push({
-            system: "email",
-            value: formData.email,
-            use: "home"
-        });
-    }
-
-    // Add address if provided
     if (formData.addressLine || formData.city || formData.state || formData.postalCode) {
-        const address = {
-            use: "home",
-            type: "both"
-        };
-
+        const address = { use: "home", type: "both" };
         if (formData.addressLine) address.line = [formData.addressLine];
         if (formData.city) address.city = formData.city;
         if (formData.state) address.state = formData.state;
         if (formData.postalCode) address.postalCode = formData.postalCode;
         address.country = "US";
-
-        fhirPatient.address.push(address);
+        fhirPatient.address = [address];
     }
 
-    // Add emergency contact if provided
     if (formData.emergencyName || formData.emergencyPhone) {
-        const emergencyContact = {
-            relationship: [
-                {
-                    coding: [
-                        {
-                            system: "http://terminology.hl7.org/CodeSystem/v2-0131",
-                            code: "C",
-                            display: formData.emergencyRelationship || "Emergency Contact"
-                        }
-                    ]
-                }
-            ]
-        };
-
-        if (formData.emergencyName) {
-            const nameParts = formData.emergencyName.split(' ');
-            emergencyContact.name = {
-                family: nameParts[nameParts.length - 1],
-                given: nameParts.slice(0, -1)
-            };
+        // v2-0131 "C" keeps its own display; the free-text relationship gets its own coded concept.
+        const relationship = [{
+            coding: [{ system: "http://terminology.hl7.org/CodeSystem/v2-0131", code: "C", display: "Emergency Contact" }]
+        }];
+        if (formData.emergencyRelationship) {
+            const coded = RELATIONSHIPS[formData.emergencyRelationship.trim().toLowerCase()];
+            const concept = { text: formData.emergencyRelationship };
+            if (coded) concept.coding = [{ system: "http://terminology.hl7.org/CodeSystem/v3-RoleCode", code: coded[0], display: coded[1] }];
+            relationship.push(concept);
         }
 
+        const emergencyContact = { relationship };
+        if (formData.emergencyName) emergencyContact.name = splitName(formData.emergencyName);
         if (formData.emergencyPhone) {
-            emergencyContact.telecom = [
-                {
-                    system: "phone",
-                    value: formData.emergencyPhone,
-                    use: "mobile"
-                }
-            ];
+            emergencyContact.telecom = [{ system: "phone", value: formData.emergencyPhone, use: "mobile" }];
         }
-
-        fhirPatient.contact.push(emergencyContact);
+        fhirPatient.contact = [emergencyContact];
     }
 
     return fhirPatient;
@@ -228,7 +220,7 @@ function mapToFhirPatient(formData) {
  * In production, this would be assigned by the EHR system
  */
 function generatePatientId() {
-    return `patient-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `patient-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 }
 
 /**
@@ -364,9 +356,10 @@ function collectFormData() {
 function displayFhirJson(fhirObject) {
     const jsonString = JSON.stringify(fhirObject, null, 2);
     const codeElement = document.getElementById('fhir-code');
-    
-    // Simple syntax highlighting
-    const highlighted = jsonString
+
+    // Escape first: patient-entered text must never be interpreted as HTML.
+    const highlighted = escapeHtml(jsonString)
+        .replace(/&quot;/g, '"')
         .replace(/"([^"]+)":/g, '<span class="json-key">"$1"</span>:')
         .replace(/: "([^"]*)"/g, ': <span class="json-string">"$1"</span>')
         .replace(/: (\d+)/g, ': <span class="json-number">$1</span>')

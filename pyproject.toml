@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fhir-patient-converter"
+version = "2.0.0"
+description = "Validate patient intake data and convert it to FHIR R4 (US Core) Patient resources"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "David Quintana" }]
+requires-python = ">=3.11"
+dependencies = ["pydantic[email]>=2.7,<3"]
+
+[project.optional-dependencies]
+test = ["pytest>=8", "pytest-cov>=5", "fhir.resources==8.3.0"]
+
+[project.scripts]
+fhir-convert = "fhir_converter.cli:main"
+
+[tool.setuptools]
+packages = ["fhir_converter"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"

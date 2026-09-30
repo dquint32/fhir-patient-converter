@@ -1,0 +1,15 @@
+{
+  "firstName": "María",
+  "lastName": "García",
+  "dob": "1985-03-15",
+  "gender": "female",
+  "phone": "(555) 123-4567",
+  "email": "maria.garcia@example.com",
+  "addressLine": "123 Medical Center Blvd",
+  "city": "Los Angeles",
+  "state": "CA",
+  "postalCode": "90001",
+  "emergencyName": "Carlos García",
+  "emergencyRelationship": "Spouse",
+  "emergencyPhone": "(555) 987-6543"
+}
