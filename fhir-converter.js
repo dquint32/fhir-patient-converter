@@ -15,6 +15,7 @@
 
 const translations = {
     en: {
+        mainKicker: "US Core · FHIR R4 · Live demo",
         mainTitle: "FHIR R4 Patient Data Converter",
         mainSubtitle: "Healthcare Interoperability Standard Compliant",
         formTitle: "Patient Information",
@@ -56,6 +57,7 @@ const translations = {
         errorValidation: "Please fill in all required fields correctly"
     },
     es: {
+        mainKicker: "US Core · FHIR R4 · Demo en vivo",
         mainTitle: "Convertidor de Datos de Pacientes FHIR R4",
         mainSubtitle: "Cumple con el Estándar de Interoperabilidad en Salud",
         formTitle: "Información del Paciente",
@@ -485,8 +487,10 @@ function handleFormSubmit(event) {
 function updateLanguage(lang) {
     currentLanguage = lang;
     const t = translations[lang];
+    document.documentElement.lang = lang;
     
     // Update main header
+    document.getElementById('main-kicker').textContent = t.mainKicker;
     document.getElementById('main-title').textContent = t.mainTitle;
     document.getElementById('main-subtitle').textContent = t.mainSubtitle;
     

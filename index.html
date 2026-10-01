@@ -1,30 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="FHIR R4 Patient Data Converter - Healthcare Interoperability Tool">
-    <title>FHIR Patient Data Converter</title>
+    <title>FHIR R4 Patient Data Converter | David Quintana</title>
+    <meta name="description" content="Convert patient intake data into a US Core–conformant FHIR R4 Patient resource in the browser, in English or Spanish.">
+    <meta name="author" content="David Quintana">
+    <meta name="color-scheme" content="dark light">
+    <meta name="theme-color" content="#0d0d0d">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap">
+    <script>try{var t=localStorage.getItem('dq-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+    <link rel="stylesheet" href="dq-theme.css">
     <link rel="stylesheet" href="fhir-converter.css">
 </head>
 <body>
-    <!-- Language Toggle -->
-    <nav class="language-nav" aria-label="Language Selection">
-        <button id="lang-en" class="lang-btn active" aria-pressed="true">English</button>
-        <button id="lang-es" class="lang-btn" aria-pressed="false">Español</button>
-    </nav>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="dq-header">
+    <div class="dq-container dq-header-inner">
+        <a class="brand" href="https://davidquintana.dev/" aria-label="David Quintana — portfolio home">
+            <span class="brand-mark" aria-hidden="true">DQ</span>
+            <span class="brand-text"><span class="brand-name">David Quintana</span><span class="brand-role">Live demo · FHIR Patient converter</span></span>
+        </a>
+        <div class="dq-tools">
+            <div class="seg language-nav" role="group" aria-label="Language / Idioma"><button type="button" id="lang-en" class="lang-btn active" aria-pressed="true">EN</button><button type="button" id="lang-es" class="lang-btn" aria-pressed="false" lang="es">ES</button></div>
+            <a class="icon-btn" href="https://github.com/dquint32/fhir-patient-converter" target="_blank" rel="noopener" aria-label="Source code on GitHub"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.9 1.3 1.9 1.3 1.1 1.9 2.9 1.3 3.6 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.7 1.7.3 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5z"/></svg></a>
+            <button class="icon-btn theme-toggle" type="button" aria-pressed="false" aria-label="Switch to light theme"><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button>
+        </div>
+    </div>
+</header>
 
-    <main class="container">
-        <header class="page-header">
+<main id="main" class="dq-main">
+    <div class="dq-container container">
+        <header class="dq-hero page-header">
+            <p class="kicker" id="main-kicker">US Core · FHIR R4 · Live demo</p>
             <h1 id="main-title">FHIR R4 Patient Data Converter</h1>
-            <p id="main-subtitle">Healthcare Interoperability Standard Compliant</p>
+            <p class="lead" id="main-subtitle">Healthcare Interoperability Standard Compliant</p>
+            <ul class="tags" aria-label="Technologies">
+                <li class="tag">FHIR R4</li><li class="tag">US Core</li><li class="tag">JavaScript</li><li class="tag">Python · Pydantic v2</li>
+            </ul>
         </header>
 
+        <div class="converter-grid">
         <!-- Patient Intake Form -->
-        <section id="patient-form-section" class="card">
-            <h2 id="form-title">Patient Information</h2>
+        <section id="patient-form-section" class="card card-accent">
+            <h2 class="section-title" id="form-title">Patient Information</h2>
             
-            <form id="patient-form" novalidate>
+            <form id="patient-form" class="dq-form" novalidate>
                 <!-- Demographics -->
                 <fieldset>
                     <legend id="legend-demographics">Demographics</legend>
@@ -158,38 +182,44 @@
 
         <!-- FHIR JSON Output -->
         <section id="fhir-converter" class="card" aria-live="polite">
-            <h2 id="output-title">FHIR R4 JSON Output</h2>
+            <h2 class="section-title" id="output-title">FHIR R4 JSON Output</h2>
             
             <div class="output-controls">
-                <button id="btn-download" class="btn btn-success" disabled>
+                <button type="button" id="btn-download" class="btn btn-primary" disabled>
                     <span id="btn-download-text">Download JSON</span>
                 </button>
-                <button id="btn-copy" class="btn btn-secondary" disabled>
+                <button type="button" id="btn-copy" class="btn btn-secondary" disabled>
                     <span id="btn-copy-text">Copy to Clipboard</span>
                 </button>
             </div>
 
-            <pre id="fhir-output" class="json-output" role="region" aria-label="FHIR JSON Output">
-                <code id="fhir-code" class="language-json"></code>
-            </pre>
+            <pre id="fhir-output" class="json-output" role="region" tabindex="0" aria-label="FHIR JSON Output"><code id="fhir-code" class="language-json"></code></pre>
 
             <!-- Metadata Display -->
             <dl class="metadata" id="metadata-section" style="display: none;">
                 <dt id="meta-resource">Resource Type:</dt>
                 <dd id="meta-resource-value">Patient</dd>
-		<dt id="meta-standard">FHIR Standard:</dt>
+                <dt id="meta-standard">FHIR Standard:</dt>
             <dd id="meta-standard-value">R4 (v4.0.1)</dd>
             
             <dt id="meta-timestamp">Generated:</dt>
             <dd id="meta-timestamp-value"></dd>
         </dl>
     </section>
+        </div>
+
+        <p class="notice" id="footer-text">Built for Healthcare Interoperability | HL7 FHIR R4 Compliant</p>
+    </div>
 </main>
 
-<footer class="page-footer">
-    <p id="footer-text">Built for Healthcare Interoperability | HL7 FHIR R4 Compliant</p>
+<footer class="dq-footer">
+    <div class="dq-container dq-footer-inner">
+        <p>© 2026 David Quintana · Demo with synthetic data — do not enter real patient information.</p>
+        <nav aria-label="Project links"><a href="https://github.com/dquint32/fhir-patient-converter" target="_blank" rel="noopener">Source code</a><a href="https://davidquintana.dev/">Portfolio</a></nav>
+    </div>
 </footer>
 
+<script src="dq-theme.js"></script>
 <script src="fhir-converter.js"></script>
 </body>
 </html>

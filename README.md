@@ -57,6 +57,7 @@ library itself does not enforce.
 
 ## 📂 File Structure
 * `index.html`, `fhir-converter.css`, `fhir-converter.js`: browser app
+* `dq-theme.css`, `dq-theme.js`: shared design system, same look as davidquintana.dev (light/dark)
 * `fhir_converter/`: Python package (models / mapping / CLI)
 * `tests/`: pytest suite · `samples/`: example input JSON
 * `.github/workflows/tests.yml`: CI on Python 3.11–3.13
